@@ -7,14 +7,14 @@
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pe.edu.upeu.sysventas.controller.LoginController">
+<AnchorPane xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pe.edu.upeu.sysventas.controller.LoginController" style="-fx-background-color: #1565C0;">
    <children>
       <AnchorPane AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
             <Circle fill="#ff5a1f" layoutX="34.0" layoutY="34.0" radius="20.0" stroke="BLACK" strokeType="INSIDE" AnchorPane.bottomAnchor="0.3999999999999986" />
             <Circle fill="#c0ff1f" layoutX="84.0" layoutY="34.0" radius="20.0" stroke="BLACK" strokeType="INSIDE" />
             <Circle fill="#1fff84" layoutX="135.0" layoutY="34.0" radius="20.0" stroke="BLACK" strokeType="INSIDE" />
-            <Label layoutX="196.0" layoutY="21.0" text="Login NemaStreet">
+            <Label layoutX="196.0" layoutY="21.0" text="Login NemaStreet" textFill="WHITE">
                <font>
                   <Font name="System Bold" size="16.0" />
                </font>
@@ -28,7 +28,7 @@
          <children>
             <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="89.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true" AnchorPane.topAnchor="10.0">
                <image>
-                  <Image url="@../img/secrecy-icon.png" />
+                  <Image url="@../img/cat_logo.png" />
                </image>
             </ImageView>
          </children>
@@ -37,7 +37,7 @@
          <children>
             <AnchorPane layoutX="14.0" layoutY="14.0" style="-fx-border-color: #b5abd1; -fx-border-radius: 3;" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0">
                <children>
-                  <Label layoutX="53.0" layoutY="14.0" text="Usuario:" />
+                  <Label layoutX="53.0" layoutY="14.0" text="Usuario:" textFill="WHITE" />
                   <TextField fx:id="txtUsuario" layoutX="117.0" layoutY="10.0" />
                </children>
                <padding>
@@ -46,7 +46,7 @@
             </AnchorPane>
             <AnchorPane layoutY="60.0" style="-fx-border-color: #b5abd1; -fx-border-radius: 3;" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0">
                <children>
-                  <Label layoutX="50.0" layoutY="13.0" text="Clave:" />
+                  <Label layoutX="50.0" layoutY="13.0" text="Clave:" textFill="WHITE" />
                   <PasswordField fx:id="txtClave" layoutX="118.0" layoutY="9.0" />
                </children>
                <padding>
