@@ -77,6 +77,14 @@ public class AppContext {
         registrar(LoginController.class, new LoginController(getBean(IUsuarioService.class)));
         registrar(MainGuiController.class, new MainGuiController(getBean(IMenuMenuItemDao.class)));
         registrar(MainProductoController.class, new MainProductoController());
+        
+        registrar(DashboardController.class, new DashboardController(
+                getBean(IClienteService.class),
+                getBean(IVentaService.class),
+                getBean(ProductoIService.class)));
+        
+        registrar(ClienteController.class, new ClienteController(getBean(IClienteService.class)));
+        registrar(ReporteController.class, new ReporteController(getBean(IVentaService.class)));
 
         registrar(ProductoController.class,
                 new ProductoController(

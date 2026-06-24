@@ -46,6 +46,8 @@ public class DatabaseConfig {
 
         Properties props = loadProperties("application.properties");
 
+        // Se comenta la inicialización del servidor TCP para evitar que procesos queden bloqueados en segundo plano
+        /*
         boolean h2ServerEnabled = Boolean.parseBoolean(props.getProperty("db.h2server.enabled", "false"));
         if (h2ServerEnabled) {
             String port = props.getProperty("db.h2server.port", "9092");
@@ -60,10 +62,11 @@ public class DatabaseConfig {
                 throw new RuntimeException("No se pudo iniciar H2 TCP Server", e);
             }
         }
-
+        */
 
         HikariConfig config = new HikariConfig();
-        config.setJdbcUrl(props.getProperty("db.url"));
+        // Configuración de la URL en modo Embebido (File-based) con AUTO_SERVER=TRUE
+        config.setJdbcUrl("jdbc:h2:file:./data/base_de_datos_tienda;DB_CLOSE_DELAY=-1;AUTO_SERVER=TRUE;TRACE_LEVEL_FILE=0");
         config.setDriverClassName(props.getProperty("db.driver", "org.h2.Driver"));
         config.setUsername(props.getProperty("db.username", "sa"));
         config.setPassword(props.getProperty("db.password", ""));
