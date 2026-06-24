@@ -15,7 +15,7 @@ public class VentCarritoRepository extends AbstractJpaRepository<VentCarrito, Lo
     @Override protected String getPkColumn()  { return "id_carrito"; }
 
     private static final String SELECT_JOIN =
-            "SELECT vc.*, p.nombre AS prod_nombre, p.pu AS prod_pu, p.stock AS prod_stock " +
+            "SELECT vc.*, p.nombre AS prod_nombre, p.pu AS prod_pu, p.stock AS prod_stock, p.talla AS prod_talla, p.color AS prod_color " +
             "FROM upeu_vent_carrito vc " +
             "JOIN upeu_producto p ON vc.id_producto = p.id_producto ";
 
@@ -34,9 +34,12 @@ public class VentCarritoRepository extends AbstractJpaRepository<VentCarrito, Lo
         vc.setPunitario(rs.getDouble("punitario"));
         vc.setPtotal(rs.getDouble("ptotal"));
         vc.setEstado(rs.getInt("estado"));
-        // Producto mínimo (solo id y nombre para la tabla)
+        // Producto mínimo (con talla y color para la tabla)
         Producto p = Producto.builder().idProducto(rs.getLong("id_producto"))
-                .nombre(rs.getString("prod_nombre")).build();
+                .nombre(rs.getString("prod_nombre"))
+                .talla(rs.getString("prod_talla"))
+                .color(rs.getString("prod_color"))
+                .build();
         vc.setIdProducto(p);
         // Usuario mínimo (solo id)
         Usuario u = new Usuario();

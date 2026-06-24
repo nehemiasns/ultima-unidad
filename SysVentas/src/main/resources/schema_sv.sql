@@ -237,7 +237,7 @@ MERGE INTO upeu_perfil (id_perfil, nombre, codigo)
 MERGE INTO upeu_usuario (id_usuario, usuario, clave, estado, id_perfil)
     KEY(id_usuario) VALUES (1, 'admin', 'admin123', 'ACTIVO', 1);
 
-MERGE INTO upeu_categoria(id_categoria, nombre) KEY(id_categoria) VALUES(1,'Zapallizas');
+MERGE INTO upeu_categoria(id_categoria, nombre) KEY(id_categoria) VALUES(1,'Zapallizas'),(2,'Chompas'),(3,'Pantalones');
 
 MERGE INTO upeu_marca(id_marca, nombre) KEY(id_marca) VALUES(1,'Adidas');
 
@@ -245,3 +245,10 @@ MERGE INTO upeu_unid_medida(id_unidad, nombre_medida) KEY(id_unidad) VALUES(1, '
 
 ALTER TABLE upeu_producto ADD COLUMN IF NOT EXISTS talla VARCHAR(20) DEFAULT '';
 ALTER TABLE upeu_producto ADD COLUMN IF NOT EXISTS color VARCHAR(20) DEFAULT '';
+
+MERGE INTO upeu_producto(id_producto, nombre, pu, puold, utilidad, stock, stockold, id_categoria, id_marca, id_unidad, talla, color) 
+KEY(id_producto) VALUES 
+(1, 'chompa', 50.0, 45.0, 5.0, 5.0, 5.0, 2, 1, 1, 'M', 'Negro'),
+(2, 'chompa', 50.0, 45.0, 5.0, 4.0, 4.0, 2, 1, 1, 'S', 'Rojo'),
+(3, 'pantalon', 80.0, 70.0, 10.0, 5.0, 5.0, 3, 1, 1, '32', 'Negro'),
+(4, 'pantalon', 80.0, 70.0, 10.0, 7.0, 7.0, 3, 1, 1, '34', 'Azul');

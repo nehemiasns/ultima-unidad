@@ -13,6 +13,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import javafx.collections.FXCollections;
 import pe.edu.upeu.sysventas.components.*;
 import pe.edu.upeu.sysventas.dto.ModeloDataAutocomplet;
 import pe.edu.upeu.sysventas.dto.PersonaDto;
@@ -21,6 +22,7 @@ import pe.edu.upeu.sysventas.dto.comprobante.Comprobante;
 import pe.edu.upeu.sysventas.enums.TipoDocumento;
 import pe.edu.upeu.sysventas.exception.ModelNotFoundException;
 import pe.edu.upeu.sysventas.model.Cliente;
+import pe.edu.upeu.sysventas.model.Producto;
 import pe.edu.upeu.sysventas.model.VentCarrito;
 import pe.edu.upeu.sysventas.model.Venta;
 import pe.edu.upeu.sysventas.model.VentaDetalle;
@@ -39,6 +41,10 @@ import java.util.function.Consumer;
 public class VentaController {
     @FXML
     TextField autocompProducto;
+    @FXML
+    ComboBox<String> cbTalla;
+    @FXML
+    ComboBox<String> cbColor;
     @FXML
     TextField nombreProducto, codigoPro, stockPro, cantidadPro, punitPro, preTPro, txtBaseImp, txtIgv, txtDescuento, txtImporteT;
     @FXML
@@ -68,6 +74,7 @@ public class VentaController {
     //private JasperPrint jasperPrint;
     private final SortedSet<ModeloDataAutocomplet> entries = new TreeSet<>((ModeloDataAutocomplet o1, ModeloDataAutocomplet o2) -> o1.toString().compareTo(o2.toString()));
     private final SortedSet<ModeloDataAutocomplet> entriesC = new TreeSet<>((ModeloDataAutocomplet o1, ModeloDataAutocomplet o2) -> o1.toString().compareTo(o2.toString()));
+    private List<Producto> allProductosVenta = new ArrayList<>();
 
     ConsultaDNI cDni;
 
@@ -99,27 +106,94 @@ public class VentaController {
             lastProducto = (ModeloDataAutocomplet) actf.getLastSelectedObject();
             if(lastProducto != null) {
                 nombreProducto.setText(lastProducto.getNameDysplay());
-                codigoPro.setText(lastProducto.getIdx());
-                String[] dato = lastProducto.getOtherData().split(":");
-                punitPro.setText(dato[0]);
-                stockPro.setText(dato[1]);
-                cantidadPro.setText("1");
-                calcularPT();
-                cantidadPro.requestFocus();
+                
+                cbTalla.getItems().clear();
+                cbColor.getItems().clear();
+                cbTalla.setDisable(true);
+                cbColor.setDisable(true);
+                codigoPro.clear();
+                stockPro.clear();
+                punitPro.clear();
+                cantidadPro.clear();
+                preTPro.clear();
+                btnRegCarrito.setDisable(true);
+
+                Set<String> tallasDisponibles = new HashSet<>();
+                for(Producto p : allProductosVenta) {
+                    if(p.getNombre().equalsIgnoreCase(lastProducto.getNameDysplay()) && p.getStock() > 0) {
+                        tallasDisponibles.add(p.getTalla());
+                    }
+                }
+                cbTalla.setItems(FXCollections.observableArrayList(tallasDisponibles));
+                if(!tallasDisponibles.isEmpty()) {
+                    cbTalla.setDisable(false);
+                }
             }
         };
         actf.setOnItemSelected(onProductoSelected);
+
+        cbTalla.setOnAction(e -> {
+            String selectedTalla = cbTalla.getSelectionModel().getSelectedItem();
+            if (selectedTalla != null) {
+                String selectedName = nombreProducto.getText();
+                
+                cbColor.getItems().clear();
+                cbColor.setDisable(true);
+                codigoPro.clear();
+                stockPro.clear();
+                punitPro.clear();
+                cantidadPro.clear();
+                preTPro.clear();
+                btnRegCarrito.setDisable(true);
+
+                Set<String> coloresDisponibles = new HashSet<>();
+                for(Producto p : allProductosVenta) {
+                    if(p.getNombre().equalsIgnoreCase(selectedName) && p.getTalla().equals(selectedTalla) && p.getStock() > 0) {
+                        coloresDisponibles.add(p.getColor());
+                    }
+                }
+                cbColor.setItems(FXCollections.observableArrayList(coloresDisponibles));
+                if(!coloresDisponibles.isEmpty()) {
+                    cbColor.setDisable(false);
+                }
+            }
+        });
+
+        cbColor.setOnAction(e -> {
+            String selectedColor = cbColor.getSelectionModel().getSelectedItem();
+            if (selectedColor != null) {
+                String selectedName = nombreProducto.getText();
+                String selectedTalla = cbTalla.getSelectionModel().getSelectedItem();
+                
+                for(Producto p : allProductosVenta) {
+                    if(p.getNombre().equalsIgnoreCase(selectedName) && p.getTalla().equals(selectedTalla) && p.getColor().equals(selectedColor)) {
+                        codigoPro.setText(String.valueOf(p.getIdProducto()));
+                        punitPro.setText(String.valueOf(p.getPu()));
+                        stockPro.setText(String.valueOf(p.getStock()));
+                        cantidadPro.setText("1");
+                        calcularPT();
+                        cantidadPro.requestFocus();
+                        break;
+                    }
+                }
+            }
+        });
 
         autocompProducto.setOnKeyReleased(e -> {
             if (e.getCode() == javafx.scene.input.KeyCode.ENTER) {
                 onProductoSelected.run();
             } else if (autocompProducto.getText().isEmpty()) {
                 nombreProducto.clear();
+                cbTalla.getItems().clear();
+                cbColor.getItems().clear();
+                cbTalla.setDisable(true);
+                cbColor.setDisable(true);
                 codigoPro.clear();
                 punitPro.clear();
                 stockPro.clear();
                 cantidadPro.clear();
                 preTPro.clear();
+                btnRegCarrito.setDisable(true);
             }
         });
 
@@ -138,7 +212,21 @@ public class VentaController {
     }
 
     public void listarProducto(){
-        entries.addAll(ps.listAutoCompletProducto());
+        entries.clear();
+        allProductosVenta = ps.findAll();
+        Set<String> nombresUnicos = new HashSet<>();
+        for(Producto p : allProductosVenta) {
+            if(p.getStock() > 0 && p.getNombre() != null) {
+                nombresUnicos.add(p.getNombre());
+            }
+        }
+        for(String nombre : nombresUnicos) {
+            ModeloDataAutocomplet data = new ModeloDataAutocomplet();
+            data.setIdx(nombre);
+            data.setNameDysplay(nombre);
+            data.setOtherData("");
+            entries.add(data);
+        }
     }
     public void listarCliente(){
         entriesC.clear();
@@ -240,13 +328,15 @@ public class VentaController {
     public void personalizarTabla(){
         TableViewHelper<VentCarrito> tableViewHelper = new TableViewHelper<>();
         LinkedHashMap<String, ColumnInfo> columns = new LinkedHashMap<>();
-        columns.put("ID Prod", new ColumnInfo("idProducto.idProducto", 100.0)); // Columna visible "Columna 1" mapea al campo "campo1"
-        columns.put("Nombre Producto", new ColumnInfo("nombreProducto", 300.0)); // Columna visible "Columna 1" mapea al campo "campo1"
+        columns.put("ID Prod", new ColumnInfo("idProducto.idProducto", 60.0)); 
+        columns.put("Nombre Producto", new ColumnInfo("nombreProducto", 200.0));
+        columns.put("Talla", new ColumnInfo("idProducto.talla", 60.0)); 
+        columns.put("Color", new ColumnInfo("idProducto.color", 70.0)); 
         columns.put("Cantidad", new ColumnInfo("cantidad", 60.0)); // Columna visible "Columna 2" mapea al campo "campo2"
         columns.put("P.Unitario", new ColumnInfo("punitario", 100.0)); // Columna visible "Columna 2" mapea al campo "campo2"
         columns.put("P.Total", new ColumnInfo("ptotal", 100.0)); // Columna visible "Columna 2" mapea al campo "campo2"
 
-        Consumer<VentCarrito> updateAction = (VentCarrito ventCarrito) -> { System.out.println("Actualizar: " + ventCarrito); };
+        Consumer<VentCarrito> updateAction = (VentCarrito ventCarrito) -> { editVenCarrito(ventCarrito); };
         Consumer<VentCarrito> deleteAction = (VentCarrito ventCarrito) -> {deleteReg(ventCarrito); };
 
         tableViewHelper.addColumnsInOrderWithSize(tableView, columns,updateAction, deleteAction );
@@ -269,7 +359,56 @@ public class VentaController {
     }
 
     public void editVenCarrito(VentCarrito obj) {
-        System.out.println(obj.getDniruc());
+        // Mover el item del carrito de vuelta al formulario
+        Producto p = obj.getIdProducto();
+        if(p != null && p.getNombre() != null) {
+            autocompProducto.setText(p.getNombre());
+            nombreProducto.setText(p.getNombre());
+            
+            // Llenar tallas
+            Set<String> tallasDisponibles = new HashSet<>();
+            for(Producto prod : allProductosVenta) {
+                if(prod.getNombre().equalsIgnoreCase(p.getNombre()) && prod.getStock() > 0) {
+                    tallasDisponibles.add(prod.getTalla());
+                }
+            }
+            cbTalla.setItems(FXCollections.observableArrayList(tallasDisponibles));
+            cbTalla.setDisable(false);
+            cbTalla.getSelectionModel().select(p.getTalla());
+
+            // Llenar colores
+            Set<String> coloresDisponibles = new HashSet<>();
+            for(Producto prod : allProductosVenta) {
+                if(prod.getNombre().equalsIgnoreCase(p.getNombre()) && prod.getTalla().equals(p.getTalla()) && prod.getStock() > 0) {
+                    coloresDisponibles.add(prod.getColor());
+                }
+            }
+            cbColor.setItems(FXCollections.observableArrayList(coloresDisponibles));
+            cbColor.setDisable(false);
+            cbColor.getSelectionModel().select(p.getColor());
+
+            codigoPro.setText(String.valueOf(p.getIdProducto()));
+            punitPro.setText(String.valueOf(obj.getPunitario()));
+            
+            for(Producto prod : allProductosVenta) {
+                if(prod.getIdProducto().equals(p.getIdProducto())) {
+                    stockPro.setText(String.valueOf(prod.getStock()));
+                    break;
+                }
+            }
+            
+            cantidadPro.setText(String.valueOf(obj.getCantidad()));
+            calcularPT();
+            btnRegCarrito.setDisable(false);
+            
+            // Eliminar del carrito para que el usuario pueda guardarlo de nuevo
+            daoC.delete(obj.getIdCarrito());
+            listar();
+            
+            Stage stage = StageManager.getPrimaryStage();
+            double with=stage.getMaxWidth()/2;
+            Toast.showToast(stage, "Producto devuelto al formulario para edición", 2000, with, 50);
+        }
     }
 
     public void deleteReg(VentCarrito obj) {
@@ -324,6 +463,8 @@ public class VentaController {
             
             autocompProducto.clear();
             nombreProducto.clear();
+            if(cbTalla != null) { cbTalla.getItems().clear(); cbTalla.setDisable(true); }
+            if(cbColor != null) { cbColor.getItems().clear(); cbColor.setDisable(true); }
             codigoPro.clear();
             stockPro.clear();
             cantidadPro.clear();

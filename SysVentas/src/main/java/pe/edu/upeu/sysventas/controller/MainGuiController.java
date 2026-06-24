@@ -67,6 +67,26 @@ public class MainGuiController {
         pause.play();
         graficarMenus();
         bp.setCenter(tabPaneFx);
+        
+        // Abrir dashboard por defecto
+        abrirTabConFXML("/view/main_dashboard.fxml", "Dashboard Principal");
+    }
+
+    public void abrirTabConFXML(String fxmlPath, String tituloTab) {
+        try {
+            AppContext ctx = AppContext.getInstance();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+            loader.setControllerFactory(clazz -> ctx.getBean(clazz));
+            Parent root = loader.load();
+            ScrollPane scrollPane = new ScrollPane(root);
+            scrollPane.setFitToWidth(true);
+            scrollPane.setFitToHeight(true);
+            Tab newTab = new Tab(tituloTab, scrollPane);
+            tabPaneFx.getTabs().clear();
+            tabPaneFx.getTabs().add(newTab);
+        } catch (IOException e) {
+            throw new RuntimeException("Error al cargar FXML: " + fxmlPath, e);
+        }
     }
 
 
@@ -199,24 +219,7 @@ public class MainGuiController {
             }
         }
 
-        private void abrirTabConFXML(String fxmlPath, String tituloTab) {
-            try {
-                AppContext ctx = AppContext.getInstance();
-                FXMLLoader loader = new
-                        FXMLLoader(getClass().getResource(fxmlPath));
-                loader.setControllerFactory(clazz -> ctx.getBean(clazz));
-                Parent root = loader.load();
-                ScrollPane scrollPane = new ScrollPane(root);
-                scrollPane.setFitToWidth(true);
-                scrollPane.setFitToHeight(true);
-                Tab newTab = new Tab(tituloTab, scrollPane);
-                tabPaneFx.getTabs().clear();
-                tabPaneFx.getTabs().add(newTab);
-            } catch (IOException e) {
-                throw new RuntimeException("Error al cargar FXML: " + fxmlPath,
-                        e);
-            }
-        }
+
 
         private void redireccionar(String fxmlPath) {
             tabPaneFx.getTabs().clear();
