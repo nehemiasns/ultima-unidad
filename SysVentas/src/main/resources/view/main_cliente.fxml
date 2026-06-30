@@ -124,7 +124,15 @@
                         </AnchorPane>
                         <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS">
                             <children>
-                                <TableView fx:id="tableView" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0" AnchorPane.bottomAnchor="5.0" />
+                                <HBox alignment="CENTER_LEFT" layoutX="5.0" layoutY="5.0" spacing="8.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
+                                    <children>
+                                        <Label text="Filtrar por:" style="-fx-font-weight: bold;" />
+                                        <ComboBox fx:id="cbxFiltro" prefWidth="130.0" promptText="Todos" />
+                                        <Button fx:id="btnFiltrar" mnemonicParsing="false" onAction="#filtrarTabla" styleClass="btn, btn-info" text="FILTRAR" />
+                                        <Button mnemonicParsing="false" onAction="#mostrarTodos" styleClass="btn, btn-default" text="Mostrar Todos" />
+                                    </children>
+                                </HBox>
+                                <TableView fx:id="tableView" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="40.0" AnchorPane.bottomAnchor="5.0" />
                             </children>
                         </AnchorPane>
                     </children>

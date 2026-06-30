@@ -71,12 +71,6 @@ public class ProductoController {
 
     @FXML
     public void initialize() {
-        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(2000), event -> {
-            stage = (Stage) miContenedor.getScene().getWindow();
-        }));
-        timeline.setCycleCount(1);
-        timeline.play();
-
         StringConverter<ComboBoxOption> converter = new StringConverter<>() {
             @Override
             public String toString(ComboBoxOption object) {
@@ -116,13 +110,15 @@ public class ProductoController {
         Consumer<Producto> updateAction = producto -> editForm(producto);
         Consumer<Producto> deleteAction = producto -> {
             ps.delete(producto.getIdProducto());
-            double w = stage.getWidth() / 1.5, h = stage.getHeight() / 2;
-            Toast.showToast(stage, "Se eliminó correctamente!!", 2000, w, h);
+            Stage currentStage = (Stage) miContenedor.getScene().getWindow();
+            double w = currentStage.getWidth() / 1.5, h = currentStage.getHeight() / 2;
+            Toast.showToast(currentStage, "Se eliminó correctamente!!", 2000, w, h);
             listar();
         };
 
         tableViewHelper.addColumnsInOrderWithSize(tableView, columns, updateAction, deleteAction);
         tableView.setTableMenuButtonVisible(true);
+        txtFiltroDato.textProperty().addListener((obs, o, n) -> filtrarProductos(n));
         listar();
     }
 
@@ -131,7 +127,6 @@ public class ProductoController {
             tableView.getItems().clear();
             listarProducto = FXCollections.observableArrayList(ps.findAll());
             tableView.getItems().addAll(listarProducto);
-            txtFiltroDato.textProperty().addListener((obs, o, n) -> filtrarProductos(n));
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -261,16 +256,23 @@ public class ProductoController {
         lbnMsg.setText("Formulario válido");
         lbnMsg.setStyle("-fx-text-fill: green; -fx-font-size: 16px;");
         limpiarError();
-        double w = stage.getWidth() / 1.5, h = stage.getHeight() / 2;
-        if (idProductoCE > 0L) {
-            formulario.setIdProducto(idProductoCE);
-            ps.update(idProductoCE, formulario);
-            Toast.showToast(stage, "Se actualizó correctamente!!", 2000, w, h);
-        } else {
-            ps.save(formulario);
-            Toast.showToast(stage, "Se guardó correctamente!!", 2000, w, h);
+        try {
+            Stage currentStage = (Stage) miContenedor.getScene().getWindow();
+            double w = currentStage.getWidth() / 1.5, h = currentStage.getHeight() / 2;
+            if (idProductoCE > 0L) {
+                formulario.setIdProducto(idProductoCE);
+                ps.update(idProductoCE, formulario);
+                Toast.showToast(currentStage, "Se actualizó correctamente!!", 2000, w, h);
+            } else {
+                ps.save(formulario);
+                Toast.showToast(currentStage, "Se guardó correctamente!!", 2000, w, h);
+            }
+            clearForm(); listar();
+        } catch (Exception e) {
+            e.printStackTrace();
+            lbnMsg.setText("Error al guardar: " + e.getMessage());
+            lbnMsg.setStyle("-fx-text-fill: red; -fx-font-size: 14px;");
         }
-        clearForm(); listar();
     }
 
     public void limpiarError() {

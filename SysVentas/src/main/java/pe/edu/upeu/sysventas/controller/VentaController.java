@@ -121,7 +121,11 @@ public class VentaController {
                 Set<String> tallasDisponibles = new HashSet<>();
                 for(Producto p : allProductosVenta) {
                     if(p.getNombre().equalsIgnoreCase(lastProducto.getNameDysplay()) && p.getStock() > 0) {
-                        tallasDisponibles.add(p.getTalla());
+                        if (p.getTalla() != null) {
+                            for (String t : p.getTalla().split(",")) {
+                                tallasDisponibles.add(t.trim());
+                            }
+                        }
                     }
                 }
                 cbTalla.setItems(FXCollections.observableArrayList(tallasDisponibles));
@@ -148,8 +152,14 @@ public class VentaController {
 
                 Set<String> coloresDisponibles = new HashSet<>();
                 for(Producto p : allProductosVenta) {
-                    if(p.getNombre().equalsIgnoreCase(selectedName) && p.getTalla().equals(selectedTalla) && p.getStock() > 0) {
-                        coloresDisponibles.add(p.getColor());
+                    if(p.getNombre().equalsIgnoreCase(selectedName) && p.getStock() > 0) {
+                        if (p.getTalla() != null && java.util.Arrays.asList(p.getTalla().split("\\s*,\\s*")).contains(selectedTalla)) {
+                            if (p.getColor() != null) {
+                                for (String c : p.getColor().split(",")) {
+                                    coloresDisponibles.add(c.trim());
+                                }
+                            }
+                        }
                     }
                 }
                 cbColor.setItems(FXCollections.observableArrayList(coloresDisponibles));
@@ -166,14 +176,18 @@ public class VentaController {
                 String selectedTalla = cbTalla.getSelectionModel().getSelectedItem();
                 
                 for(Producto p : allProductosVenta) {
-                    if(p.getNombre().equalsIgnoreCase(selectedName) && p.getTalla().equals(selectedTalla) && p.getColor().equals(selectedColor)) {
-                        codigoPro.setText(String.valueOf(p.getIdProducto()));
-                        punitPro.setText(String.valueOf(p.getPu()));
-                        stockPro.setText(String.valueOf(p.getStock()));
-                        cantidadPro.setText("1");
-                        calcularPT();
-                        cantidadPro.requestFocus();
-                        break;
+                    if(p.getNombre().equalsIgnoreCase(selectedName)) {
+                        boolean matchTalla = p.getTalla() != null && java.util.Arrays.asList(p.getTalla().split("\\s*,\\s*")).contains(selectedTalla);
+                        boolean matchColor = p.getColor() != null && java.util.Arrays.asList(p.getColor().split("\\s*,\\s*")).contains(selectedColor);
+                        if (matchTalla && matchColor) {
+                            codigoPro.setText(String.valueOf(p.getIdProducto()));
+                            punitPro.setText(String.valueOf(p.getPu()));
+                            stockPro.setText(String.valueOf(p.getStock()));
+                            cantidadPro.setText("1");
+                            calcularPT();
+                            cantidadPro.requestFocus();
+                            break;
+                        }
                     }
                 }
             }
@@ -369,23 +383,31 @@ public class VentaController {
             Set<String> tallasDisponibles = new HashSet<>();
             for(Producto prod : allProductosVenta) {
                 if(prod.getNombre().equalsIgnoreCase(p.getNombre()) && prod.getStock() > 0) {
-                    tallasDisponibles.add(prod.getTalla());
+                    if (prod.getTalla() != null) {
+                        for (String t : prod.getTalla().split(",")) {
+                            tallasDisponibles.add(t.trim());
+                        }
+                    }
                 }
             }
             cbTalla.setItems(FXCollections.observableArrayList(tallasDisponibles));
             cbTalla.setDisable(false);
-            cbTalla.getSelectionModel().select(p.getTalla());
+            cbTalla.getSelectionModel().select(p.getTalla() != null ? p.getTalla().split(",")[0].trim() : "");
 
             // Llenar colores
             Set<String> coloresDisponibles = new HashSet<>();
             for(Producto prod : allProductosVenta) {
-                if(prod.getNombre().equalsIgnoreCase(p.getNombre()) && prod.getTalla().equals(p.getTalla()) && prod.getStock() > 0) {
-                    coloresDisponibles.add(prod.getColor());
+                if(prod.getNombre().equalsIgnoreCase(p.getNombre()) && prod.getStock() > 0) {
+                    if (prod.getColor() != null) {
+                        for (String c : prod.getColor().split(",")) {
+                            coloresDisponibles.add(c.trim());
+                        }
+                    }
                 }
             }
             cbColor.setItems(FXCollections.observableArrayList(coloresDisponibles));
             cbColor.setDisable(false);
-            cbColor.getSelectionModel().select(p.getColor());
+            cbColor.getSelectionModel().select(p.getColor() != null ? p.getColor().split(",")[0].trim() : "");
 
             codigoPro.setText(String.valueOf(p.getIdProducto()));
             punitPro.setText(String.valueOf(obj.getPunitario()));

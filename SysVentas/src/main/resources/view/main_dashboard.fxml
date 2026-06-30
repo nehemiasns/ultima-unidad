@@ -89,7 +89,7 @@
                   </VBox>
                   <VBox HBox.hgrow="ALWAYS" style="-fx-border-color: #bdc3c7; -fx-border-radius: 5;">
                      <children>
-                        <PieChart fx:id="pieChartStock" animated="false" title="Distribución de Stock" />
+                        <PieChart fx:id="pieChartStock" animated="false" title="Stock Restante" />
                      </children>
                      <padding>
                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />

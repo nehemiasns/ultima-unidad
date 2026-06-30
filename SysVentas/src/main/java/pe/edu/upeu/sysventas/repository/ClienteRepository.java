@@ -25,11 +25,12 @@ public class ClienteRepository extends AbstractJpaRepository<Cliente, String> {
     @Override
     protected Cliente insert(Connection conn, Cliente e) throws SQLException {
         try (PreparedStatement ps = conn.prepareStatement(
-                "INSERT INTO upeu_cliente(dniruc,nombres,rep_legal,tipo_documento) VALUES(?,?,?,?)")) {
+                "INSERT INTO upeu_cliente(dniruc,nombres,rep_legal,tipo_documento,direccion) VALUES(?,?,?,?,?)")) {
             ps.setString(1, e.getDniruc());
             ps.setString(2, e.getNombres());
             ps.setString(3, e.getRepLegal());
             ps.setString(4, e.getTipoDocumento().name());
+            ps.setString(5, e.getDireccion());
             ps.executeUpdate();
         }
         return e;
@@ -37,10 +38,11 @@ public class ClienteRepository extends AbstractJpaRepository<Cliente, String> {
     @Override
     protected Cliente updateRow(Connection conn, Cliente e) throws SQLException {
         executeUpdate(conn,
-                "UPDATE upeu_cliente SET nombres=?,rep_legal=?,tipo_documento=? WHERE dniruc=?",
+                "UPDATE upeu_cliente SET nombres=?,rep_legal=?,tipo_documento=?,direccion=? WHERE dniruc=?",
                 e.getNombres(),
                 e.getRepLegal(),
                 e.getTipoDocumento().name(),
+                e.getDireccion(),
                 e.getDniruc());
         return e;
     }

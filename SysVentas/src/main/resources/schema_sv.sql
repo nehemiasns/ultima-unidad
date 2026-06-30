@@ -243,8 +243,10 @@ MERGE INTO upeu_marca(id_marca, nombre) KEY(id_marca) VALUES(1,'Adidas');
 
 MERGE INTO upeu_unid_medida(id_unidad, nombre_medida) KEY(id_unidad) VALUES(1, 'Unidad');
 
-ALTER TABLE upeu_producto ADD COLUMN IF NOT EXISTS talla VARCHAR(20) DEFAULT '';
-ALTER TABLE upeu_producto ADD COLUMN IF NOT EXISTS color VARCHAR(20) DEFAULT '';
+ALTER TABLE upeu_producto ADD COLUMN IF NOT EXISTS talla VARCHAR(100) DEFAULT '';
+ALTER TABLE upeu_producto ADD COLUMN IF NOT EXISTS color VARCHAR(100) DEFAULT '';
+ALTER TABLE upeu_producto ALTER COLUMN talla VARCHAR(100);
+ALTER TABLE upeu_producto ALTER COLUMN color VARCHAR(100);
 
 MERGE INTO upeu_producto(id_producto, nombre, pu, puold, utilidad, stock, stockold, id_categoria, id_marca, id_unidad, talla, color) 
 KEY(id_producto) VALUES 
