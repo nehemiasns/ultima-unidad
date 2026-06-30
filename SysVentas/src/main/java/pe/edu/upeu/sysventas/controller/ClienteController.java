@@ -96,6 +96,26 @@ public class ClienteController {
         lbnMsg.setText(" ");
     }
 
+    @FXML
+    public void buscarDni(ActionEvent event) {
+        String dni = txtDniRuc.getText();
+        if (dni != null && !dni.trim().isEmpty()) {
+            pe.edu.upeu.sysventas.utils.ConsultaDNI consulta = new pe.edu.upeu.sysventas.utils.ConsultaDNI();
+            pe.edu.upeu.sysventas.dto.PersonaDto persona = consulta.consultarDNI(dni);
+            if (persona != null) {
+                txtNombres.setText(persona.getNombre() + " " + persona.getApellidoPaterno() + " " + persona.getApellidoMaterno());
+                lbnMsg.setText("DNI encontrado y llenado correctamente");
+                lbnMsg.setStyle("-fx-text-fill: green;");
+            } else {
+                lbnMsg.setText("DNI no encontrado o error en la búsqueda");
+                lbnMsg.setStyle("-fx-text-fill: red;");
+            }
+        } else {
+            lbnMsg.setText("Ingrese un DNI válido para buscar");
+            lbnMsg.setStyle("-fx-text-fill: red;");
+        }
+    }
+
     private void clearForm() {
         txtDniRuc.clear();
         txtDniRuc.setDisable(false);
